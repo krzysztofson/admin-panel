@@ -8,26 +8,24 @@
           <div class="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-7 2xl:gap-x-32">
             <div>
               <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">Country</p>
-              <p class="text-sm font-medium text-gray-800 dark:text-white/90">United States</p>
+              <p class="text-sm font-medium text-gray-800 dark:text-white/90">Poland</p>
             </div>
 
             <div>
               <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">City/State</p>
-              <p class="text-sm font-medium text-gray-800 dark:text-white/90">
-                Phoenix, United States
-              </p>
+              <p class="text-sm font-medium text-gray-800 dark:text-white/90">Warsaw, Poland</p>
             </div>
 
             <div>
               <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">
                 Postal Code
               </p>
-              <p class="text-sm font-medium text-gray-800 dark:text-white/90">ERT 2489</p>
+              <p class="text-sm font-medium text-gray-800 dark:text-white/90">01-931</p>
             </div>
 
             <div>
-              <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">TAX ID</p>
-              <p class="text-sm font-medium text-gray-800 dark:text-white/90">AS4568384</p>
+              <p class="mb-2 text-xs leading-normal text-gray-500 dark:text-gray-400">NIP</p>
+              <p class="text-sm font-medium text-gray-800 dark:text-white/90">1182164675</p>
             </div>
           </div>
         </div>

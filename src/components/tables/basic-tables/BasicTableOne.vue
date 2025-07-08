@@ -4,7 +4,7 @@
     <div class="mb-4 flex justify-end">
       <button
         @click="isAddUserModal = true"
-        class="flex items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors"
+        class="flex w-full justify-center items-center gap-2 rounded-lg bg-brand-500 px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-600 transition-colors"
       >
         <svg
           class="fill-current"
@@ -49,6 +49,9 @@
               </th>
               <th class="px-5 py-3 text-left w-2/11 sm:px-6">
                 <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Zarobki</p>
+              </th>
+              <th class="px-5 py-3 text-left w-2/11 sm:px-6">
+                <p class="font-medium text-gray-500 text-theme-xs dark:text-gray-400">Szanse</p>
               </th>
             </tr>
           </thead>
@@ -103,6 +106,47 @@
               <td class="px-5 py-4 sm:px-6">
                 <p class="text-gray-500 text-theme-sm dark:text-gray-400">{{ user.income }}</p>
               </td>
+              <td class="px-5 py-4 sm:px-6">
+                <div class="flex items-center gap-2">
+                  <!-- Odds Visual Indicator -->
+                  <div class="relative w-6 h-6">
+                    <svg class="w-6 h-6 transform -rotate-90" viewBox="0 0 24 24">
+                      <!-- Background circle -->
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        fill="none"
+                        class="text-gray-200 dark:text-gray-700"
+                      />
+                      <!-- Progress circle -->
+                      <circle
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        fill="none"
+                        :class="{
+                          'text-red-500': user.odds === 1,
+                          'text-yellow-500': user.odds === 2,
+                          'text-green-500': user.odds === 3,
+                        }"
+                        :stroke-dasharray="
+                          user.odds === 1
+                            ? '20.94 62.83'
+                            : user.odds === 2
+                              ? '41.89 41.89'
+                              : '56.55 6.28'
+                        "
+                        stroke-linecap="round"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -145,7 +189,82 @@
             </p>
           </div>
           <form class="flex flex-col" @submit.prevent="addNewUser">
-            <div class="custom-scrollbar h-[458px] overflow-y-auto p-2">
+            <div class="custom-scrollbar h-[550px] overflow-y-auto p-2">
+              <!-- Image Upload Section -->
+              <div class="mb-6">
+                <h5 class="mb-3 text-lg font-medium text-gray-800 dark:text-white/90">
+                  Smart Data Extraction
+                </h5>
+                <div
+                  @drop="handleDrop"
+                  @dragover="handleDragOver"
+                  @dragenter="handleDragEnter"
+                  @dragleave="handleDragLeave"
+                  :class="[
+                    'border-2 border-dashed rounded-lg p-6 text-center transition-colors',
+                    {
+                      'border-brand-300 bg-brand-50 dark:bg-brand-900/20': isDragOver,
+                      'border-gray-300 dark:border-gray-600': !isDragOver,
+                    },
+                  ]"
+                >
+                  <div v-if="!isAnalyzing">
+                    <svg
+                      class="mx-auto h-12 w-12 text-gray-400"
+                      stroke="currentColor"
+                      fill="none"
+                      viewBox="0 0 48 48"
+                    >
+                      <path
+                        d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                    <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                      <span class="font-medium">Drag and drop an image</span> or
+                      <label class="cursor-pointer text-brand-600 hover:text-brand-500">
+                        <span>browse</span>
+                        <input
+                          type="file"
+                          class="sr-only"
+                          @change="handleFileSelect"
+                          accept="image/*"
+                        />
+                      </label>
+                    </p>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      AI will extract user data from the image
+                    </p>
+                  </div>
+                  <div v-else class="flex items-center justify-center">
+                    <div
+                      class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-600"
+                    ></div>
+                    <span class="ml-2 text-sm text-gray-600 dark:text-gray-400"
+                      >Analyzing image...</span
+                    >
+                  </div>
+                </div>
+                <div v-if="uploadedImage" class="mt-3 flex items-center gap-2">
+                  <img :src="uploadedImage" alt="Uploaded" class="h-10 w-10 object-cover rounded" />
+                  <span class="text-sm text-gray-600 dark:text-gray-400">{{
+                    uploadedFileName
+                  }}</span>
+                  <button @click="clearImage" type="button" class="text-red-500 hover:text-red-700">
+                    <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M6 18L18 6M6 6l12 12"
+                      ></path>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+
               <div>
                 <h5 class="mb-5 text-lg font-medium text-gray-800 dark:text-white/90 lg:mb-6">
                   User Information
@@ -251,7 +370,25 @@
                     />
                   </div>
 
-                  <div class="col-span-2">
+                  <div class="col-span-2 lg:col-span-1">
+                    <label
+                      class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
+                    >
+                      Odds *
+                    </label>
+                    <select
+                      v-model.number="newUser.odds"
+                      required
+                      class="h-11 w-full rounded-lg border border-gray-300 bg-transparent bg-none px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs focus:border-brand-300 focus:outline-hidden focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800"
+                    >
+                      <option value="">Select odds</option>
+                      <option value="1">1 - Low (Red)</option>
+                      <option value="2">2 - Medium (Yellow)</option>
+                      <option value="3">3 - High (Green)</option>
+                    </select>
+                  </div>
+
+                  <div class="">
                     <label
                       class="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400"
                     >
@@ -293,9 +430,16 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import Modal from '../../../components/profile/Modal.vue'
+import { useOpenAI } from '../../../composables/useOpenAI'
 
 const router = useRouter()
+const { analyzeUserImage } = useOpenAI()
+
 const isAddUserModal = ref(false)
+const isDragOver = ref(false)
+const isAnalyzing = ref(false)
+const uploadedImage = ref(null)
+const uploadedFileName = ref('')
 
 const newUser = ref({
   name: '',
@@ -305,23 +449,23 @@ const newUser = ref({
   status: '',
   income: '',
   phone: '',
+  odds: '',
 })
 
 const navigateToProfile = (user) => {
   router.push({
     name: 'Profile',
     query: {
-      userId: user.name.replace(/\s+/g, '-').toLowerCase(), // Create a simple ID from name
+      userId: user.name.replace(/\s+/g, '-').toLowerCase(),
       userData: JSON.stringify(user),
     },
   })
 }
 
 const addNewUser = () => {
-  // Add the new user to the users array
   users.value.push({ ...newUser.value })
 
-  // Reset the form
+  // Reset the form and clear image
   newUser.value = {
     name: '',
     role: '',
@@ -330,13 +474,91 @@ const addNewUser = () => {
     status: '',
     income: '',
     phone: '',
+    odds: '',
   }
 
-  // Close the modal
+  clearImage()
   isAddUserModal.value = false
-
-  // Optional: Show success message
   console.log('User added successfully')
+}
+
+// Drag and drop handlers
+const handleDragOver = (e) => {
+  e.preventDefault()
+  isDragOver.value = true
+}
+
+const handleDragEnter = (e) => {
+  e.preventDefault()
+  isDragOver.value = true
+}
+
+const handleDragLeave = (e) => {
+  e.preventDefault()
+  isDragOver.value = false
+}
+
+const handleDrop = (e) => {
+  e.preventDefault()
+  isDragOver.value = false
+
+  const files = e.dataTransfer?.files
+  if (files && files.length > 0) {
+    const file = files[0]
+    if (file.type.startsWith('image/')) {
+      processImage(file)
+    } else {
+      alert('Please upload an image file')
+    }
+  }
+}
+
+const handleFileSelect = (e) => {
+  const target = e.target
+  const files = target.files
+  if (files && files.length > 0) {
+    const file = files[0]
+    processImage(file)
+  }
+}
+
+const processImage = async (file) => {
+  try {
+    isAnalyzing.value = true
+    uploadedFileName.value = file.name
+
+    // Create preview URL
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      uploadedImage.value = e.target?.result
+    }
+    reader.readAsDataURL(file)
+
+    // Analyze image with OpenAI
+    const extractedData = await analyzeUserImage(file)
+
+    // Fill form with extracted data
+    newUser.value = {
+      name: extractedData.name || '',
+      role: extractedData.role || '',
+      imploymentType: extractedData.imploymentType || '',
+      age: extractedData.age?.toString() || '',
+      status: extractedData.status || '',
+      income: extractedData.income || '',
+      phone: extractedData.phone || '',
+      odds: extractedData.odds || Math.floor(Math.random() * 3) + 1, // Random odds 1-3 if not provided
+    }
+  } catch (error) {
+    console.error('Error processing image:', error)
+    alert('Failed to analyze image. Please fill the form manually.')
+  } finally {
+    isAnalyzing.value = false
+  }
+}
+
+const clearImage = () => {
+  uploadedImage.value = null
+  uploadedFileName.value = ''
 }
 
 const users = ref([
@@ -348,6 +570,7 @@ const users = ref([
     status: 'Active',
     income: '3.9K',
     phone: '+48 600 500 400',
+    odds: 3,
   },
   {
     name: 'Kaiya George',
@@ -357,6 +580,7 @@ const users = ref([
     status: 'Pending',
     income: '24.9K',
     phone: '+48 600 500 400',
+    odds: 1,
   },
   {
     name: 'Zain Geidt',
@@ -366,6 +590,7 @@ const users = ref([
     status: 'Active',
     income: '12.7K',
     phone: '+48 600 500 400',
+    odds: 3,
   },
   {
     name: 'Abram Schleifer',
@@ -375,6 +600,7 @@ const users = ref([
     status: 'Cancel',
     income: '2.8K',
     phone: '+48 600 500 400',
+    odds: 3,
   },
   {
     name: 'Carla George',
@@ -384,6 +610,7 @@ const users = ref([
     status: 'Active',
     income: '4.5K',
     phone: '+48 600 500 400',
+    odds: 3,
   },
   {
     name: 'Lindsey Curtis',
@@ -393,6 +620,7 @@ const users = ref([
     status: 'Active',
     income: '3.9K',
     phone: '+48 600 500 400',
+    odds: 3,
   },
   {
     name: 'Kaiya George',
@@ -402,6 +630,7 @@ const users = ref([
     status: 'Pending',
     income: '24.9K',
     phone: '+48 600 500 400',
+    odds: 2,
   },
   {
     name: 'Zain Geidt',
@@ -411,6 +640,7 @@ const users = ref([
     status: 'Active',
     income: '12.7K',
     phone: '+48 600 500 400',
+    odds: 1,
   },
   {
     name: 'Abram Schleifer',
@@ -420,6 +650,7 @@ const users = ref([
     status: 'Cancel',
     income: '2.8K',
     phone: '+48 600 500 400',
+    odds: 2,
   },
   {
     name: 'Carla George',
@@ -429,6 +660,7 @@ const users = ref([
     status: 'Active',
     income: '4.5K',
     phone: '+48 600 500 400',
+    odds: 3,
   },
 ])
 </script>
